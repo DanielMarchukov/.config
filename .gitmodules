@@ -28,3 +28,6 @@
 [submodule "sketchybar-app-font"]
 	path = sketchybar-app-font
 	url = https://github.com/kvndrsslr/sketchybar-app-font.git
+[submodule "nvim"]
+	path = nvim
+	url = https://github.com/DanielMarchukov/nvim.git
