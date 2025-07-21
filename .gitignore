@@ -12,6 +12,14 @@ configstore/
 # Development tools with potential sensitive data
 thefuck/
 
+# Compiled binaries and build artifacts
+*/helper
+*.o
+*.exe
+*.bin
+*.dylib
+*.so
+
 # Additional directories to ignore
 .DS_Store
 *.log
