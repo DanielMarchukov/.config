@@ -1,4 +1,19 @@
+# GitHub CLI and related tools (contain auth tokens)
 gh/
-thefuck/
+gh-copilot/
 github-copilot/
 
+# GitLab CLI (contains auth tokens and personal aliases)
+glab-cli/
+
+# Configuration stores (may contain sensitive data)
+configstore/
+
+# Development tools with potential sensitive data
+thefuck/
+
+# Additional directories to ignore
+.DS_Store
+*.log
+tmp/
+cache/
