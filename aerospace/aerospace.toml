@@ -74,7 +74,10 @@ inner.horizontal = 10
 inner.vertical = 10
 outer.left = 10
 outer.bottom = 10
-outer.top = 10
+outer.top = [
+  { monitor."LS27D70xE" = 46 },           # 4K external monitor (36px bar + 10px padding)
+  10                                       # Default for built-in and other monitors
+]
 outer.right = 10
 
 # 'main' binding mode declaration
