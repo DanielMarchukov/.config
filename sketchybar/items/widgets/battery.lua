@@ -95,7 +95,18 @@ battery:subscribe("mouse.clicked", function(env)
     if drawing == "off" then
         sbar.exec("pmset -g batt", function(batt_info)
             local found, _, remaining = batt_info:find(" (%d+:%d+) remaining")
-            local label = found and remaining .. "h" or "No estimate"
+            local charging = batt_info:find("charging")
+            local charged = batt_info:find("charged")
+
+            local label = "No estimate"
+            if charged then
+                label = "Fully charged"
+            elseif charging then
+                label = "Charging"
+            elseif found then
+                label = remaining .. "h"
+            end
+
             remaining_time:set({
                 label = label
             })
