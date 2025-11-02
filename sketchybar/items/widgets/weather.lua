@@ -5,9 +5,10 @@ local settings = require("settings")
 -- Weather locations
 local locations = {
     {name = "London", display = "London, UK"},
-    {name = "Roses,Girona,Spain", display = "Roses, Spain"}
+    {name = "Roses,Girona,Spain", display = "Roses, Spain"},
+    {name = "Athens,Greece", display = "Athens, Greece"}
 }
-local current_location_index = 1
+local current_location_index = 3  -- Default to Athens
 
 local weather = sbar.add("item", "widgets.weather", {
     position = "right",
@@ -20,12 +21,13 @@ local weather = sbar.add("item", "widgets.weather", {
     },
     label = {
         string = "Loading...",
-        width = 150,
         font = {
             family = settings.font.text,
             style = settings.font.style_map["Regular"],
             size = 12.0
-        }
+        },
+        padding_left = 8,
+        padding_right = 8
     },
     update_freq = 1800,
     popup = {
