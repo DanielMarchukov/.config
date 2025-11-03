@@ -48,21 +48,34 @@ local function parse_vpn_status(json_str)
     local vpn_type = ""
     local server = ""
 
+    -- Parse connected boolean
+    connected = json_str:match('"connected":true') ~= nil
+
     -- Parse installed array
-    for vpn in json_str:gmatch('"([^"]+)"') do
-        if vpn == "openvpn" or vpn == "nordvpn" then
+    local installed_str = json_str:match('"installed":%[(.-)%]')
+    if installed_str then
+        for vpn in installed_str:gmatch('"([^"]+)"') do
             table.insert(installed, vpn)
-        elseif vpn_type == "" then
-            vpn_type = vpn
-        elseif default == "" then
-            default = vpn
-        elseif server == "" then
-            server = vpn
         end
     end
 
-    -- Parse connected boolean
-    connected = json_str:match('"connected":true') ~= nil
+    -- Parse default
+    local default_match = json_str:match('"default":"([^"]*)"')
+    if default_match then
+        default = default_match
+    end
+
+    -- Parse vpn_type
+    local vpn_type_match = json_str:match('"vpn_type":"([^"]*)"')
+    if vpn_type_match then
+        vpn_type = vpn_type_match
+    end
+
+    -- Parse server
+    local server_match = json_str:match('"server":"([^"]*)"')
+    if server_match then
+        server = server_match
+    end
 
     return {
         installed = installed,
@@ -74,51 +87,56 @@ local function parse_vpn_status(json_str)
 end
 
 local function update_vpn_status()
-    sbar.exec("~/.config/sketchybar/helpers/vpn_status.sh", function(result)
-        result = result:gsub("^%s*(.-)%s*$", "%1")
+    sbar.exec("bash ~/.config/sketchybar/helpers/vpn_status.sh", function(result)
+        -- sbar.exec automatically parses JSON output into a Lua table
+        if not result or type(result) ~= "table" then
+            return
+        end
 
-        if result and result ~= "" then
-            vpn_state = parse_vpn_status(result)
+        vpn_state.installed = result.installed or {}
+        vpn_state.connected = result.connected or false
+        vpn_state.default = result.default or ""
+        vpn_state.vpn_type = result.vpn_type or ""
+        vpn_state.server = result.server or ""
 
-            -- Hide widget if no VPN clients installed
-            if #vpn_state.installed == 0 then
-                vpn:set({drawing = false})
-                return
+        -- Hide widget if no VPN clients installed
+        if #vpn_state.installed == 0 then
+            vpn:set({drawing = false})
+            return
+        end
+
+        -- Show widget
+        vpn:set({drawing = true})
+
+        -- Update icon and label based on connection status
+        if vpn_state.connected then
+            local display_name = vpn_state.vpn_type == "openvpn" and "OpenVPN" or "NordVPN"
+            local label_text = display_name
+            if vpn_state.server and vpn_state.server ~= "" then
+                label_text = label_text .. " (" .. vpn_state.server .. ")"
             end
 
-            -- Show widget
-            vpn:set({drawing = true})
-
-            -- Update icon and label based on connection status
-            if vpn_state.connected then
-                local display_name = vpn_state.vpn_type == "openvpn" and "OpenVPN" or "NordVPN"
-                local label_text = display_name
-                if vpn_state.server and vpn_state.server ~= "" then
-                    label_text = label_text .. " (" .. vpn_state.server .. ")"
-                end
-
-                vpn:set({
-                    icon = {
-                        string = "󰖁",  -- Connected VPN icon
-                        color = colors.green
-                    },
-                    label = {
-                        string = label_text,
-                        color = colors.white
-                    }
-                })
-            else
-                vpn:set({
-                    icon = {
-                        string = "󰖂",  -- Disconnected VPN icon
-                        color = colors.grey
-                    },
-                    label = {
-                        string = "VPN",
-                        color = colors.grey
-                    }
-                })
-            end
+            vpn:set({
+                icon = {
+                    string = "󰖁",  -- Connected VPN icon
+                    color = colors.green
+                },
+                label = {
+                    string = label_text,
+                    color = colors.white
+                }
+            })
+        else
+            vpn:set({
+                icon = {
+                    string = "󰖂",  -- Disconnected VPN icon
+                    color = colors.grey
+                },
+                label = {
+                    string = "VPN",
+                    color = colors.grey
+                }
+            })
         end
     end)
 end

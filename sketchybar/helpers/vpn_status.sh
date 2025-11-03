@@ -63,6 +63,20 @@ if echo "$SCUTIL_OUTPUT" | grep -q "Connected"; then
     fi
 fi
 
+# If not detected via scutil, check for OpenVPN Connect via utun interfaces
+if [ "$OPENVPN_INSTALLED" = true ] && [ -z "$VPN_TYPE" ]; then
+    # Check if ovpnagent process is running and there's an active utun interface with IP
+    if pgrep -f "ovpnagent" > /dev/null 2>&1; then
+        # Check for utun interfaces with IPv4 addresses (indicating active VPN)
+        UTUN_IP=$(ifconfig | grep -A 4 "^utun" | grep "inet " | grep -v "127.0.0.1" | head -1 | awk '{print $2}')
+        if [ -n "$UTUN_IP" ]; then
+            CONNECTED=true
+            VPN_TYPE="openvpn"
+            VPN_SERVER=""
+        fi
+    fi
+fi
+
 # Build installed VPN list
 INSTALLED_LIST=""
 if [ "$OPENVPN_INSTALLED" = true ]; then

@@ -61,12 +61,16 @@ for i, workspace in ipairs(workspaces) do
     sbar.exec("aerospace list-windows --workspace " .. i .. " --format '%{app-name}' --json ", function(apps)
         local icon_line = ""
         local no_app = true
+        local seen_apps = {}
         for i, app in ipairs(apps) do
             no_app = false
             local app_name = app["app-name"]
-            local lookup = app_icons[app_name]
-            local icon = ((lookup == nil) and app_icons["default"] or lookup)
-            icon_line = icon_line .. " " .. icon
+            if not seen_apps[app_name] then
+                seen_apps[app_name] = true
+                local lookup = app_icons[app_name]
+                local icon = ((lookup == nil) and app_icons["default"] or lookup)
+                icon_line = icon_line .. " " .. icon
+            end
         end
 
         -- Hide workspace if no apps, show if has apps
@@ -181,12 +185,16 @@ space_window_observer:subscribe("space_windows_change", function(env)
         sbar.exec("aerospace list-windows --workspace " .. i .. " --format '%{app-name}' --json ", function(apps)
             local icon_line = ""
             local no_app = true
+            local seen_apps = {}
             for i, app in ipairs(apps) do
                 no_app = false
                 local app_name = app["app-name"]
-                local lookup = app_icons[app_name]
-                local icon = ((lookup == nil) and app_icons["default"] or lookup)
-                icon_line = icon_line .. " " .. icon
+                if not seen_apps[app_name] then
+                    seen_apps[app_name] = true
+                    local lookup = app_icons[app_name]
+                    local icon = ((lookup == nil) and app_icons["default"] or lookup)
+                    icon_line = icon_line .. " " .. icon
+                end
             end
 
             -- Hide workspace if no apps, show if has apps
@@ -211,12 +219,16 @@ space_window_observer:subscribe("aerospace_focus_change", function(env)
         sbar.exec("aerospace list-windows --workspace " .. i .. " --format '%{app-name}' --json ", function(apps)
             local icon_line = ""
             local no_app = true
+            local seen_apps = {}
             for i, app in ipairs(apps) do
                 no_app = false
                 local app_name = app["app-name"]
-                local lookup = app_icons[app_name]
-                local icon = ((lookup == nil) and app_icons["default"] or lookup)
-                icon_line = icon_line .. " " .. icon
+                if not seen_apps[app_name] then
+                    seen_apps[app_name] = true
+                    local lookup = app_icons[app_name]
+                    local icon = ((lookup == nil) and app_icons["default"] or lookup)
+                    icon_line = icon_line .. " " .. icon
+                end
             end
 
             -- Hide workspace if no apps, show if has apps
