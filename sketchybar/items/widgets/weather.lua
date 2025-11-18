@@ -8,7 +8,7 @@ local locations = {
     {name = "Roses,Girona,Spain", display = "Roses, Spain"},
     {name = "Athens,Greece", display = "Athens, Greece"}
 }
-local current_location_index = 3  -- Default to Athens
+local current_location_index = 1  -- Default to London
 
 local weather = sbar.add("item", "widgets.weather", {
     position = "right",
