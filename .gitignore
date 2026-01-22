@@ -25,3 +25,11 @@ thefuck/
 *.log
 tmp/
 cache/
+
+# Git internals (sometimes extracted by accident or created by IDEs)
+HEAD
+config
+description
+hooks/
+info/
+jgit/
