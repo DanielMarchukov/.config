@@ -12,6 +12,9 @@ configstore/
 # Development tools with potential sensitive data
 thefuck/
 
+# Go environment
+go/
+
 # Compiled binaries and build artifacts
 */helper
 *.o
