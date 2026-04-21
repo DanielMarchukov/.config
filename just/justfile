@@ -1,0 +1,182 @@
+set shell := ["bash", "-uc"]
+
+default:
+    @just --list --unsorted
+
+build: gradle-current-build
+
+clean: gradle-current-clean
+
+test: gradle-current-test
+
+clean-build: gradle-current-clean-build
+
+gradle-root-clean:
+    ./gradlew clean
+
+gradle-root-build:
+    ./gradlew build
+
+gradle-root-test:
+    ./gradlew test
+
+gradle-root-clean-build:
+    ./gradlew clean build
+
+gradle-current-clean:
+    @root="$(pwd)"; \
+      while [[ ! -f "$root/gradlew" && ! -f "$root/settings.gradle" && ! -f "$root/settings.gradle.kts" ]]; do \
+        parent="$(dirname "$root")"; \
+        if [[ "$parent" == "$root" ]]; then \
+          echo "Not inside a Gradle project" >&2; \
+          exit 1; \
+        fi; \
+        root="$parent"; \
+      done; \
+      module_dir="$(pwd)"; \
+      while [[ "$module_dir" != "$root" && ! -f "$module_dir/build.gradle" && ! -f "$module_dir/build.gradle.kts" ]]; do \
+        parent="$(dirname "$module_dir")"; \
+        if [[ "$parent" == "$module_dir" ]]; then \
+          echo "Could not resolve current Gradle module" >&2; \
+          exit 1; \
+        fi; \
+        module_dir="$parent"; \
+      done; \
+      if [[ "$module_dir" == "$root" ]]; then \
+        task="clean"; \
+      else \
+        rel="${module_dir#"$root"/}"; \
+        task=":${rel//\//:}:clean"; \
+      fi; \
+      cd "$root"; \
+      ./gradlew "$task"
+
+gradle-current-build:
+    @root="$(pwd)"; \
+      while [[ ! -f "$root/gradlew" && ! -f "$root/settings.gradle" && ! -f "$root/settings.gradle.kts" ]]; do \
+        parent="$(dirname "$root")"; \
+        if [[ "$parent" == "$root" ]]; then \
+          echo "Not inside a Gradle project" >&2; \
+          exit 1; \
+        fi; \
+        root="$parent"; \
+      done; \
+      module_dir="$(pwd)"; \
+      while [[ "$module_dir" != "$root" && ! -f "$module_dir/build.gradle" && ! -f "$module_dir/build.gradle.kts" ]]; do \
+        parent="$(dirname "$module_dir")"; \
+        if [[ "$parent" == "$module_dir" ]]; then \
+          echo "Could not resolve current Gradle module" >&2; \
+          exit 1; \
+        fi; \
+        module_dir="$parent"; \
+      done; \
+      if [[ "$module_dir" == "$root" ]]; then \
+        task="build"; \
+      else \
+        rel="${module_dir#"$root"/}"; \
+        task=":${rel//\//:}:build"; \
+      fi; \
+      cd "$root"; \
+      ./gradlew "$task"
+
+gradle-current-test:
+    @root="$(pwd)"; \
+      while [[ ! -f "$root/gradlew" && ! -f "$root/settings.gradle" && ! -f "$root/settings.gradle.kts" ]]; do \
+        parent="$(dirname "$root")"; \
+        if [[ "$parent" == "$root" ]]; then \
+          echo "Not inside a Gradle project" >&2; \
+          exit 1; \
+        fi; \
+        root="$parent"; \
+      done; \
+      module_dir="$(pwd)"; \
+      while [[ "$module_dir" != "$root" && ! -f "$module_dir/build.gradle" && ! -f "$module_dir/build.gradle.kts" ]]; do \
+        parent="$(dirname "$module_dir")"; \
+        if [[ "$parent" == "$module_dir" ]]; then \
+          echo "Could not resolve current Gradle module" >&2; \
+          exit 1; \
+        fi; \
+        module_dir="$parent"; \
+      done; \
+      if [[ "$module_dir" == "$root" ]]; then \
+        task="test"; \
+      else \
+        rel="${module_dir#"$root"/}"; \
+        task=":${rel//\//:}:test"; \
+      fi; \
+      cd "$root"; \
+      ./gradlew "$task"
+
+gradle-current-clean-build:
+    @root="$(pwd)"; \
+      while [[ ! -f "$root/gradlew" && ! -f "$root/settings.gradle" && ! -f "$root/settings.gradle.kts" ]]; do \
+        parent="$(dirname "$root")"; \
+        if [[ "$parent" == "$root" ]]; then \
+          echo "Not inside a Gradle project" >&2; \
+          exit 1; \
+        fi; \
+        root="$parent"; \
+      done; \
+      module_dir="$(pwd)"; \
+      while [[ "$module_dir" != "$root" && ! -f "$module_dir/build.gradle" && ! -f "$module_dir/build.gradle.kts" ]]; do \
+        parent="$(dirname "$module_dir")"; \
+        if [[ "$parent" == "$module_dir" ]]; then \
+          echo "Could not resolve current Gradle module" >&2; \
+          exit 1; \
+        fi; \
+        module_dir="$parent"; \
+      done; \
+      if [[ "$module_dir" == "$root" ]]; then \
+        clean_task="clean"; \
+        build_task="build"; \
+      else \
+        rel="${module_dir#"$root"/}"; \
+        clean_task=":${rel//\//:}:clean"; \
+        build_task=":${rel//\//:}:build"; \
+      fi; \
+      cd "$root"; \
+      ./gradlew "$clean_task" "$build_task"
+
+gradle-module-clean module:
+    @module='{{ module }}'; \
+      module="${module#./}"; \
+      module="${module%/}"; \
+      if [[ -z "$module" ]]; then \
+        echo "Module path is required" >&2; \
+        exit 1; \
+      fi; \
+      gradle_module=":${module//\//:}"; \
+      ./gradlew "${gradle_module}:clean"
+
+gradle-module-build module:
+    @module='{{ module }}'; \
+      module="${module#./}"; \
+      module="${module%/}"; \
+      if [[ -z "$module" ]]; then \
+        echo "Module path is required" >&2; \
+        exit 1; \
+      fi; \
+      gradle_module=":${module//\//:}"; \
+      ./gradlew "${gradle_module}:build"
+
+gradle-module-test module:
+    @module='{{ module }}'; \
+      module="${module#./}"; \
+      module="${module%/}"; \
+      if [[ -z "$module" ]]; then \
+        echo "Module path is required" >&2; \
+        exit 1; \
+      fi; \
+      gradle_module=":${module//\//:}"; \
+      ./gradlew "${gradle_module}:test"
+
+gradle-module-clean-build module:
+    @module='{{ module }}'; \
+      module="${module#./}"; \
+      module="${module%/}"; \
+      if [[ -z "$module" ]]; then \
+        echo "Module path is required" >&2; \
+        exit 1; \
+      fi; \
+      gradle_module=":${module//\//:}"; \
+      ./gradlew "${gradle_module}:clean" "${gradle_module}:build"

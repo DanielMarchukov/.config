@@ -12,6 +12,10 @@ configstore/
 # Development tools with potential sensitive data
 thefuck/
 
+# Runtime dependency checkouts are installed outside this repo.
+sketchybar-app-font/
+tmux/plugins/
+
 # Go environment
 go/
 
